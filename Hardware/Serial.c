@@ -54,6 +54,7 @@ void Serial_SendArray(uint8_t *Array,uint8_t length)
 
 uint8_t Rxdata;
 char string[100];
+uint8_t Flag = 0;
 
 void USART1_IRQHandler(void)
 {
@@ -67,29 +68,31 @@ void USART1_IRQHandler(void)
         if(Rxdata == '%' && status == 0)
         {
             status = 1;
+            Flag = 0;
         }
 
         else if(status == 1)
         {
             if(Rxdata != '\r')
             {
-                string[loop] = Rxdata;
-                loop++;
-            }
-            else
-            {
-                string[loop] = '\0';
-                status = 2;
-                loop = 0;
-            }
+				if(Rxdata != '\n')
+				{
+					string[loop] = Rxdata;
+					loop++;
+				}
+				else
+				{
+					string[loop] = '\0';
+					status = 2;
+					loop = 0;
+				}
+			}
         }
 
         else if(status == 2)
         {
-            if(Rxdata == '\n')
-            {
-                status = 0;
-            }
+            status = 0;
+            Flag = 1;
         }
         USART_ClearITPendingBit(USART1,USART_FLAG_RXNE);
     }
@@ -98,5 +101,10 @@ void USART1_IRQHandler(void)
 uint8_t Serial_GetTxdata(void)
 {
     return Rxdata;
+}
+
+uint8_t Serial_GetFlag(void)
+{
+    return Flag;
 }
 

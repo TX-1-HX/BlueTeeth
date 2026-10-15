@@ -12,15 +12,18 @@ int main(void)
 	uint8_t test = 0;
 	char target_String[] = "LEDON";
 	
-	if(strcmp(string,target_String) == 0)
-	{
-		PWM_SetCompare(60);
 
-	}
-	else
-	{test = 1;}
 	while(1)
 	{
+		if(Serial_GetFlag())
+		{
+			if(strcmp(string,target_String) == 0)
+			{
+				PWM_SetCompare(60);
+			}	
+			else {test = 1;}
+		}
+
 		OLED_ShowNum(2,1,test,1);
 		OLED_ShowString(1,1,string);
 	}
